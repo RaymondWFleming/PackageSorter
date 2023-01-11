@@ -1,0 +1,261 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE ieee.std_logic_unsigned.all;
+USE ieee.numeric_std.all;
+ENTITY PackageSorter IS
+PORT (weight : IN UNSIGNED (9 DOWNTO 0);--Input Weight
+ reset,sort : IN STD_LOGIC; --Input Reset, Clock, Sort button
+clk : IN STD_LOGIC;
+clkOut,ResOut,SortOut,SortedOut : OUT STD_LOGIC;
+OutcurrentGrp : OUT UNSIGNED (0 TO 2); --Current Group
+Grp1SS : OUT UNSIGNED(1 TO 7) := "1111110";
+
+Grp2SS : OUT UNSIGNED(1 TO 7) := "1111110";
+Grp3SS : OUT UNSIGNED(1 TO 7) := "1111110";
+Grp4SS : OUT UNSIGNED(1 TO 7) := "1111110";
+currentSS : OUT UNSIGNED(1 TO 7) := "0000001";
+Grp1LED : OUT UNSIGNED(3 downto 0) := "0000");
+END PackageSorter;
+ARCHITECTURE Behavior OF PackageSorter IS
+COMPONENT seven_seg_hex IS
+PORT (bin: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+Leds: OUT STD_LOGIC_VECTOR(1 TO 7));
+END COMPONENT;
+SIGNAL sorted : std_logic :='0';
+SIGNAL currentGrp : std_logic_vector (2 DOWNTO 0) := "000"; --Current Group
+
+SIGNAL tmpG1 : std_logic_vector (0 to 3) :="0000";
+SIGNAL tmpG2 : std_logic_vector (0 to 3) :="0000";
+SIGNAL tmpG3 : std_logic_vector (0 to 3) :="0000";
+SIGNAL tmpG4 : std_logic_vector (0 to 3) :="0000";
+signal unsorted : std_logic:='0';
+BEGIN
+PROCESS (clk, reset, sort)
+BEGIN
+IF reset='0' THEN
+tmpG1<= "0000" ;
+tmpG2<= "0000" ;
+tmpG3<= "0000" ;
+tmpG4<= "0000" ;
+CurrentGrp<= "000" ;
+Grp1SS<="0000001";
+Grp2SS<="0000001";
+Grp3SS<="0000001";
+Grp4SS<="0000001";
+currentSS<="1111110";
+sorted<='0';
+ELSIF rising_edge(clk) AND sorted = '0' AND sorted = '0' THEN
+if(sort = '0') then
+IF (weight="0000000000") THEN
+CurrentGrp<="000";
+tmpG1<=tmpG1;
+tmpG2<=tmpG2;
+tmpG3<=tmpG3;
+tmpG4<=tmpG4;
+ELSIF (weight < 200) THEN
+currentGrp<="001";
+tmpG1<=tmpG1+1;
+tmpG2<=tmpG2;
+tmpG3<=tmpG3;
+tmpG4<=tmpG4;
+ELSIF (weight < 500) THEN
+currentGrp<="010";
+tmpG1<=tmpG1;
+tmpG2<=tmpG2+1;
+tmpG3<=tmpG3;
+tmpG4<=tmpG4;
+ELSIF (weight< 801) THEN
+currentGrp<="011";
+tmpG1<=tmpG1;
+tmpG2<=tmpG2;
+tmpG3<=tmpG3+1;
+tmpG4<=tmpG4;
+ELSE
+currentGrp<="100";
+tmpG1<=tmpG1;
+tmpG2<=tmpG2;
+tmpG3<=tmpG3;
+tmpG4<=tmpG4+1;
+END IF;
+case currentGrp is
+when "000" => currentSS <= "1111110";
+when "001" => currentSS <= "1001111";
+when "010" => currentSS <= "0010010";
+when "011" => currentSS <= "0000110";
+when "100" => currentSS <= "1001100";
+when others => null;
+END CASE;
+case tmpG1 is
+when "0000" => Grp1SS <= "0000001";
+when "0001" => Grp1SS <= "1001111";
+when "0010" => Grp1SS <= "0010010";
+when "0011" => Grp1SS <= "0000110";
+when "0100" => Grp1SS <= "1001100";
+when "0101" => Grp1SS <= "0100100";
+when "0110" => Grp1SS <= "0100000";
+when "0111" => Grp1SS <= "0001111";
+when "1000" => Grp1SS <= "0000000";
+when "1001" => Grp1SS <= "0001100";
+when "1010" => Grp1SS <= "0001000";
+when "1011" => Grp1SS <= "1100000";
+when "1100" => Grp1SS <= "0110001";
+when "1101" => Grp1SS <= "1000010";
+when "1110" => Grp1SS <= "0110000";
+when "1111" => Grp1SS <= "0111000";
+when others => null;
+end case;
+case tmpG2 is
+when "0000" => Grp2SS <= "0000001";
+when "0001" => Grp2SS <= "1001111";
+when "0010" => Grp2SS <= "0010010";
+when "0011" => Grp2SS <= "0000110";
+when "0100" => Grp2SS <= "1001100";
+when "0101" => Grp2SS <= "0100100";
+when "0110" => Grp2SS <= "0100000";
+when "0111" => Grp2SS <= "0001111";
+when "1000" => Grp2SS <= "0000000";
+when "1001" => Grp2SS <= "0001100";
+when "1010" => Grp2SS <= "0001000";
+when "1011" => Grp2SS <= "1100000";
+when "1100" => Grp2SS <= "0110001";
+when "1101" => Grp2SS <= "1000010";
+when "1110" => Grp2SS <= "0110000";
+when "1111" => Grp2SS <= "0111000";
+when others => null;
+end case;
+case tmpG3 is
+when "0000" => Grp3SS <= "0000001";
+when "0001" => Grp3SS <= "1001111";
+when "0010" => Grp3SS <= "0010010";
+when "0011" => Grp3SS <= "0000110";
+when "0100" => Grp3SS <= "1001100";
+when "0101" => Grp3SS <= "0100100";
+when "0110" => Grp3SS <= "0100000";
+when "0111" => Grp3SS <= "0001111";
+when "1000" => Grp3SS <= "0000000";
+when "1001" => Grp3SS <= "0001100";
+when "1010" => Grp3SS <= "0001000";
+when "1011" => Grp3SS <= "1100000";
+when "1100" => Grp3SS <= "0110001";
+when "1101" => Grp3SS <= "1000010";
+when "1110" => Grp3SS <= "0110000";
+when "1111" => Grp3SS <= "0111000";
+when others => null;
+end case;
+case tmpG4 is
+when "0000" => Grp4SS <= "0000001";
+when "0001" => Grp4SS <= "1001111";
+when "0010" => Grp4SS <= "0010010";
+when "0011" => Grp4SS <= "0000110";
+when "0100" => Grp4SS <= "1001100";
+when "0101" => Grp4SS <= "0100100";
+when "0110" => Grp4SS <= "0100000";
+when "0111" => Grp4SS <= "0001111";
+when "1000" => Grp4SS <= "0000000";
+when "1001" => Grp4SS <= "0001100";
+when "1010" => Grp4SS <= "0001000";
+when "1011" => Grp4SS <= "1100000";
+when "1100" => Grp4SS <= "0110001";
+when "1101" => Grp4SS <= "1000010";
+when "1110" => Grp4SS <= "0110000";
+when "1111" => Grp4SS <= "0111000";
+when others => null;
+end case;
+sorted<='1';
+else
+sorted<=sorted;
+end if;
+elsif (rising_edge(clk) AND sort = '1') then
+tmpG1<=tmpG1;
+tmpG2<=tmpG2;
+tmpG3<=tmpG3;
+tmpG4<=tmpG4;
+case tmpG1 is
+when "0000" => Grp1SS <= "0000001";
+when "0001" => Grp1SS <= "1001111";
+when "0010" => Grp1SS <= "0010010";
+when "0011" => Grp1SS <= "0000110";
+when "0100" => Grp1SS <= "1001100";
+when "0101" => Grp1SS <= "0100100";
+when "0110" => Grp1SS <= "0100000";
+when "0111" => Grp1SS <= "0001111";
+when "1000" => Grp1SS <= "0000000";
+when "1001" => Grp1SS <= "0001100";
+when "1010" => Grp1SS <= "0001000";
+when "1011" => Grp1SS <= "1100000";
+when "1100" => Grp1SS <= "0110001";
+when "1101" => Grp1SS <= "1000010";
+when "1110" => Grp1SS <= "0110000";
+when "1111" => Grp1SS <= "0111000";
+when others => null;
+end case;
+case tmpG2 is
+when "0000" => Grp2SS <= "0000001";
+when "0001" => Grp2SS <= "1001111";
+when "0010" => Grp2SS <= "0010010";
+when "0011" => Grp2SS <= "0000110";
+when "0100" => Grp2SS <= "1001100";
+when "0101" => Grp2SS <= "0100100";
+when "0110" => Grp2SS <= "0100000";
+when "0111" => Grp2SS <= "0001111";
+when "1000" => Grp2SS <= "0000000";
+when "1001" => Grp2SS <= "0001100";
+when "1010" => Grp2SS <= "0001000";
+when "1011" => Grp2SS <= "1100000";
+when "1100" => Grp2SS <= "0110001";
+when "1101" => Grp2SS <= "1000010";
+when "1110" => Grp2SS <= "0110000";
+when "1111" => Grp2SS <= "0111000";
+when others => null;
+end case;
+case tmpG3 is
+when "0000" => Grp3SS <= "0000001";
+when "0001" => Grp3SS <= "1001111";
+when "0010" => Grp3SS <= "0010010";
+when "0011" => Grp3SS <= "0000110";
+when "0100" => Grp3SS <= "1001100";
+when "0101" => Grp3SS <= "0100100";
+when "0110" => Grp3SS <= "0100000";
+when "0111" => Grp3SS <= "0001111";
+when "1000" => Grp3SS <= "0000000";
+when "1001" => Grp3SS <= "0001100";
+when "1010" => Grp3SS <= "0001000";
+when "1011" => Grp3SS <= "1100000";
+when "1100" => Grp3SS <= "0110001";
+when "1101" => Grp3SS <= "1000010";
+when "1110" => Grp3SS <= "0110000";
+when "1111" => Grp3SS <= "0111000";
+when others => null;
+end case;
+case tmpG4 is
+when "0000" => Grp4SS <= "0000001";
+when "0001" => Grp4SS <= "1001111";
+when "0010" => Grp4SS <= "0010010";
+when "0011" => Grp4SS <= "0000110";
+when "0100" => Grp4SS <= "1001100";
+when "0101" => Grp4SS <= "0100100";
+when "0110" => Grp4SS <= "0100000";
+when "0111" => Grp4SS <= "0001111";
+when "1000" => Grp4SS <= "0000000";
+when "1001" => Grp4SS <= "0001100";
+when "1010" => Grp4SS <= "0001000";
+when "1011" => Grp4SS <= "1100000";
+when "1100" => Grp4SS <= "0110001";
+when "1101" => Grp4SS <= "1000010";
+when "1110" => Grp4SS <= "0110000";
+when "1111" => Grp4SS <= "0111000";
+when others => null;
+end case;
+case currentGrp is
+when "000" => currentSS <= "1111110";
+when "001" => currentSS <= "1001111";
+when "010" => currentSS <= "0010010";
+when "011" => currentSS <= "0000110";
+when "100" => currentSS <= "1001100";
+when others => null;
+end case;
+sorted<=not sort;
+end if;
+END PROCESS;
+clkout<=clk;
+END BEHAVIOR;
